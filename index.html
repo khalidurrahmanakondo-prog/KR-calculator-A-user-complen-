@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KR Calculator A - Support Center</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f1f1;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .other-issue {
+            grid-column: span 2; 
+            width: 100%;        
+            text-align: center;
+            font-weight: bold;   
+        }
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding-bottom: 20px;
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .header h1 {
+            font-size: 24px;
+            color: #4B4B4B;
+            margin: 0;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .header p {
+            font-size: 14px;
+            color: #666;
+            margin: 5px 0 0;
+        }
+        .top-stats {
+            display: flex;
+            gap: 12px;
+            padding: 15px;
+        }
+        .stat-box {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            color: white;
+            font-size: 11px;
+            text-align: center;
+            font-weight: bold;
+            line-height: 1.5;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .green { background-color: #28a745; }
+        .purple { background-color: #6f42c1; transition: 0.3s; }
+        
+        .limit-reached-bg { background-color: #ff3b3b !important; }
+
+        .form-section { padding: 15px; }
+
+        .input-label {
+            font-size: 14px;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .token-area-code {
+            border: 2px dashed #6f42c1;
+            padding: 15px;
+            border-radius: 15px;
+            background-color: #f9f7ff;
+            margin-bottom: 20px;
+            transition: 0.5s ease;
+        }
+
+        /* Success & Error Styles for Token Box */
+        .token-area-code.success {
+            background-color: #d4edda !important;
+            border: 2px solid #28a745 !important;
+        }
+        .token-area-code.success .input-label, 
+        .token-area-code.success .hint-text,
+        .token-area-code.success .token-id-text,
+        .token-area-code.success i {
+            color: #155724 !important;
+        }
+
+        .token-area-code.error {
+            background-color: #f8d7da !important;
+            border: 2px solid #dc3545 !important;
+        }
+        .token-area-code.error .input-label, 
+        .token-area-code.error .hint-text,
+        .token-area-code.error .token-id-text,
+        .token-area-code.error i {
+            color: #721c24 !important;
+        }
+
+        /* Token Status Message */
+        .token-status-msg {
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .token-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .token-id-text { font-weight: bold; color: #333; font-size: 18px; }
+        .token-box {
+            width: 38px;
+            height: 45px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #6f42c1;
+            background: white;
+            transition: 0.3s;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background-color: #fafafa;
+        }
+        .input-field:focus { border-color: #28a745; outline: none; background: #fff; }
+
+        .issue-trigger-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #424e5e;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .issue-grid {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .issue-item {
+            padding: 12px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .issue-item.active {
+            background: #ff0000;
+            color: white;
+            border-color: #cc0000;
+        }
+
+        .submit-btn {
+            background: linear-gradient(to right, #28a745, #218838);
+            color: white;
+            border: none;
+            padding: 18px;
+            width: 100%;
+            border-radius: 35px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+            transition: 0.3s;
+        }
+        .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        #success-section {
+            display: none;
+            padding: 40px 25px;
+            text-align: center;
+            position: relative;
+        }
+        .icon-box {
+            width: 90px;
+            height: 90px;
+            background: #28a745;
+            border-radius: 50%;
+            margin: 0 auto 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 5;
+            transform: scale(0);
+        }
+        .icon-box i { color: white; font-size: 45px; opacity: 0; }
+        .pop-in-anim { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .fade-in-icon { animation: fadeInIcon 0.3s 0.5s forwards; }
+
+        @keyframes popIn { to { transform: scale(1); } }
+        @keyframes fadeInIcon { to { opacity: 1; } }
+
+        .ray {
+            position: absolute;
+            width: 3px;
+            height: 40px;
+            background: linear-gradient(to bottom, #28a745, transparent);
+            top: 50%; left: 50%;
+            transform-origin: top center;
+            opacity: 0;
+            animation: greenRay 2s infinite ease-out;
+        }
+        @keyframes greenRay {
+            0% { transform: rotate(var(--deg)) translateY(35px); opacity: 1; }
+            100% { transform: rotate(var(--deg)) translateY(100px); opacity: 0; }
+        }
+
+        .token-display {
+            background: #fdfbff;
+            border: 2px dashed #6f42c1;
+            padding: 18px;
+            border-radius: 15px;
+            margin: 25px 0;
+            font-size: 24px;
+            font-weight: 900;
+            color: #333;
+            letter-spacing: 1px;
+        }
+
+        .copy-button {
+            background: #6f42c1;
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            transition: 0.3s;
+        }
+        .info-text { font-size: 14px; color: #555; line-height: 1.5; margin: 15px 0; }
+        .hint-text { font-size: 11px; color: #888; margin-bottom: 15px; display: block; }
+    </style>
+</head>
+<body onload="initializeData()">
+
+<div class="app-container">
+    
+    <div id="form-container">
+        <div class="header">
+            <h1>KR CALCULATOR A</h1>
+            <p>অভিযোগ ফরম ও সহায়তা কেন্দ্র</p>
+        </div>
+
+        <div class="top-stats">
+            <div class="stat-box green">আপনার নতুন টোকেন সংগ্রহ করুন:<br><span id="gen-token">KR-000000</span></div>
+            <div id="limit-box" class="stat-box purple">
+                <span id="limit-display">লোড হচ্ছে...</span>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div id="tokenArea" class="token-area-code">
+                <div class="input-label"><i class="fa fa-folder-open"></i> পুরাতন টোকেন আইডি দিন</div>
+                <span class="hint-text">আগের সমস্যা সমাধান না হয়ে থাকলে টোকেনটি দিন</span>
+                <div class="token-container">
+                    <span class="token-id-text">KR-</span>
+                    <input type="text" id="b1" class="token-box" maxlength="1" inputmode="numeric" oninput="stepNext(this, 'b2'); handleVerify();">
+                    <input type="text" id="b2" class="token-box" maxlength="1" inputmode="numeric" oninput="stepNext(this, 'b3'); handleVerify();" onkeydown="stepBack(event, 'b2', 'b1')">
+                    <input type="text" id="b3" class="token-box" maxlength="1" inputmode="numeric" oninput="stepNext(this, 'b4'); handleVerify();" onkeydown="stepBack(event, 'b3', 'b2')">
+                    <input type="text" id="b4" class="token-box" maxlength="1" inputmode="numeric" oninput="stepNext(this, 'b5'); handleVerify();" onkeydown="stepBack(event, 'b4', 'b3')">
+                    <input type="text" id="b5" class="token-box" maxlength="1" inputmode="numeric" oninput="stepNext(this, 'b6'); handleVerify();" onkeydown="stepBack(event, 'b5', 'b4')">
+                    <input type="text" id="b6" class="token-box" maxlength="1" inputmode="numeric" oninput="handleVerify();" onkeydown="stepBack(event, 'b6', 'b5')">
+                </div>
+                <!-- Token Status Message Element -->
+                <div id="token-status-msg" class="token-status-msg"></div>
+            </div>
+
+            <div class="input-label">👤 আপনার নাম লিখুন</div>
+            <input type="text" id="u_name" class="input-field" placeholder="সম্পূর্ণ নাম লিখুন যেমন তুফায়েল আহমাদ ">
+
+            <div class="input-label">📍 আপনার বর্তমান ঠিকানা</div>
+            <input type="text" id="u_addr" class="input-field" placeholder="গ্রাম, থানা, জেলা">
+
+            <div class="input-label">📞 ফোন নম্বর</div>
+            <input type="tel" id="u_phone" class="input-field" placeholder="+8801XXXXXXXXX" maxlength="11" inputmode="numeric">
+
+            <div class="input-label">📧 ইমেইল লিখুন</div>
+            <input type="email" id="u_email" class="input-field" placeholder="example@mail.com">
+
+            <div class="input-label">⚠️ সমস্যার ধরন নির্বাচন করুন (সর্বোচ্চ ৬টি)</div>
+            <button class="issue-trigger-btn" onclick="toggleIssueMenu()">সিলেক্ট করুন <span>⌵</span></button>
+            <div id="issueMenu" class="issue-grid">
+                <div class="issue-item" onclick="toggleActive(this)">অংক ভুল</div>
+                <div class="issue-item" onclick="toggleActive(this)">বাটন এরর</div>
+                <div class="issue-item" onclick="toggleActive(this)">অ্যাপ স্লো</div>
+                <div class="issue-item" onclick="toggleActive(this)">অ্যাপ সমস্যা</div>
+                <div class="issue-item" onclick="toggleActive(this)">অ্যাপ হ্যাং করে</div>
+                <div class="issue-item" onclick="toggleActive(this)">ভুল হিসাব</div>
+                <div class="issue-item" onclick="toggleActive(this)">কিবোর্ড ওপেন হয় না</div>
+                <div class="issue-item" onclick="toggleActive(this)">হিস্ট্রি মুছে যায় না</div>
+                <div class="issue-item" onclick="toggleActive(this)">ফলাফল কপি হয় না</div>
+                <div class="issue-item" onclick="toggleActive(this)">দশমিক হিসাব ভুল</div>
+                <div class="issue-item" onclick="toggleActive(this)">অতিরিক্ত বিজ্ঞাপন</div>
+                <div class="issue-item" onclick="toggleActive(this)">সায়েন্টিফিক মোড এরর</div>
+                <div class="issue-item" onclick="toggleActive(this)">ফন্ট দেখা যায় না</div>
+                <div class="issue-item" onclick="toggleActive(this)">স্কয়ার/রুট এরর</div>
+                <div class="issue-item" onclick="toggleActive(this)">ব্র্যাকেট কাজ করে না</div>
+                <div class="issue-item" onclick="toggleActive(this)">বাটন সাইজ ছোট</div>
+                <div class="issue-item" onclick="toggleActive(this)">মেমোরি বাটন এরর</div>
+                <div class="issue-item" onclick="toggleActive(this)">শতকরা (%) ভুল আসে</div>
+                <div class="issue-item" onclick="toggleActive(this)">সাউন্ড সমস্যা</div>
+                <div class="issue-item" onclick="toggleActive(this)">অটো ক্লোজ সমস্যা</div>
+                <div class="issue-item other-issue" onclick="toggleActive(this)">অন্যান্য সমস্যা</div>
+            </div>
+
+            <div class="input-label">📝 আপনার বিস্তারিত অভিযোগ অথবা মতামত জানান </div>
+            <textarea id="u_desc" class="input-field" rows="4" placeholder="বিস্তারিত লিখুন (কমপক্ষে ৫০ অক্ষর)..."></textarea>
+
+            <button class="submit-btn" id="submitBtn" onclick="finalValidationAndSubmit()">
+                <i class="fa fa-rocket"></i> আপনার মূল্যবান অভিযোগ এডমিন প্যানেলের কাছে জমা দিতে এখানে ক্লিক করুন
+            </button>
+        </div>
+    </div>
+
+    <div id="success-section">
+        <div id="ray-wrap" style="position: absolute; top: 18%; left: 50%;"></div>
+        <div class="icon-box" id="success-icon"><i class="fa fa-check" id="success-check-mark"></i></div>
+        <h2 style="color: #28a745; font-size: 28px; margin: 0; font-weight: 800;">অভিনন্দন!</h2>
+        <p class="info-text">আপনার অভিযোগটি সফলভাবে গ্রহণ করা হয়েছে। দ্রুত আমরা আপনার সাথে যোগাযোগ করবো।</p>
+        <div class="token-display" id="finalTokenID"></div>
+        <button class="copy-button" onclick="copyId()"><i class="fa fa-copy"></i> টোকেন আইডি কপি করুন</button>
+        <button style="margin-top:10px;" class="copy-button" onclick="location.reload()"><i class="fa fa-home"></i> ফিরে যান</button>
+    </div>
+
+</div>
+
+<!-- Firebase Modular SDK & Core Logic (Eternally Connected) -->
+<script type="module">
+    // Firebase Modular SDK Import
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getDatabase, ref, push, set, get, onValue } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAwYro75-Mx5K0ZBKlGXqOm8z6ywyjuBIk",
+      authDomain: "kr-calculator-a-database.firebaseapp.com",
+      databaseURL: "https://kr-calculator-a-database-default-rtdb.firebaseio.com",
+      projectId: "kr-calculator-a-database",
+      storageBucket: "kr-calculator-a-database.firebasestorage.app",
+      messagingSenderId: "589418851848",
+      appId: "1:589418851848:web:8f38a5258a37535d86abbd",
+      measurementId: "G-BBY1HMYC0V"
+    };
+
+    // Initialize Firebase robustly
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    emailjs.init("h6otK23mXSSYHsa0U");
+
+    // Highly robust Browser Fingerprint logic
+    function getFingerprint() {
+        const d = [navigator.userAgent, navigator.language, screen.width+'x'+screen.height, new Date().getTimezoneOffset()].join('|');
+        let h = 0; 
+        for (let i = 0; i < d.length; i++) { 
+            h = ((h << 5) - h) + d.charCodeAt(i); 
+            h |= 0; 
+        }
+        return "ID-" + Math.abs(h);
+    }
+    
+    const currentFP = getFingerprint();
+    let isOldTokenMatch = true; // Default true, because the field is optional
+    let isLimitReached = false;
+    let countdownInterval;
+
+    // Load Data & Limits securely
+    window.initializeData = function() {
+        document.getElementById('gen-token').innerText = "KR-" + Math.floor(100000 + Math.random() * 900000);
+        
+        const logRef = ref(db, 'user_complaint_logs/' + currentFP);
+        onValue(logRef, (snapshot) => {
+            const now = Date.now();
+            const fifteenDays = 15 * 24 * 60 * 60 * 1000;
+            let validLogs = [];
+
+            if (snapshot.exists()) {
+                snapshot.forEach(child => {
+                    const logTime = child.val().time;
+                    if (now - logTime < fifteenDays) {
+                        validLogs.push(logTime);
+                    }
+                });
+            }
+
+            const remaining = 3 - validLogs.length;
+            const limitBox = document.getElementById('limit-box');
+            const limitDisplay = document.getElementById('limit-display');
+
+            clearInterval(countdownInterval);
+
+            if (remaining > 0) {
+                isLimitReached = false;
+                limitBox.style.backgroundColor = '#6f42c1';
+                limitDisplay.innerHTML = `অভিযোগ বাকি আছে:<br>${remaining} টি`;
+            } else {
+                isLimitReached = true;
+                limitBox.style.backgroundColor = '#ff3b3b';
+                
+                const oldestLog = Math.min(...validLogs);
+                const nextTime = oldestLog + fifteenDays;
+
+                countdownInterval = setInterval(() => {
+                    const diff = nextTime - Date.now();
+                    if (diff <= 0) {
+                        clearInterval(countdownInterval);
+                        initializeData();
+                    } else {
+                        const d = Math.floor(diff / 86400000);
+                        const h = Math.floor((diff % 86400000) / 3600000);
+                        const m = Math.floor((diff % 3600000) / 60000);
+                        const s = Math.floor((diff % 60000) / 1000);
+                        limitDisplay.innerHTML = `পরবর্তী অভিযোগ চালু হবে:<br>${d}দ ${h}ঘ ${m}মি ${s}সে`;
+                    }
+                }, 1000);
+            }
+        });
+    };
+
+    // Strict Firebase Lifetime Verification for Token
+    window.handleVerify = async function() {
+        const digits = [1,2,3,4,5,6].map(i => document.getElementById('b'+i).value).join('');
+        const area = document.getElementById('tokenArea');
+        const msgEl = document.getElementById('token-status-msg');
+        
+        // Remove classes instantly on typing
+        area.classList.remove('success', 'error');
+
+        if (digits.length === 0) {
+            // Optional field - Completely empty is fine
+            msgEl.innerText = "";
+            isOldTokenMatch = true; 
+        } else if (digits.length > 0 && digits.length < 6) {
+            // Typing in progress, only show message, do not make the box red
+            msgEl.innerText = "যাচাইয়ের জন্য ৬ ডিজিট পূর্ণ করুন...";
+            msgEl.style.color = "#6f42c1";
+            isOldTokenMatch = false; // Block submit until complete
+        } else if (digits.length === 6) {
+            // 6 digits entered -> Search entire Firebase lifetime database
+            msgEl.innerText = "সারাজীবনের ডাটাবেজ যাচাই করা হচ্ছে...";
+            msgEl.style.color = "#4B4B4B";
+
+            const oldID = "KR-" + digits;
+            try {
+                // Fetch directly from Firebase
+                const snap = await get(ref(db, 'token_database/' + oldID));
+                
+                if (snap.exists() && snap.val().fp === currentFP) {
+                    area.classList.add('success');
+                    msgEl.innerText = "আপনার টোকেন পাওয়া গেছে ✅";
+                    msgEl.style.color = "#155724";
+                    isOldTokenMatch = true;
+                } else {
+                    area.classList.add('error');
+                    msgEl.innerText = "আপনার টোকেন পাওয়া যায়নি ❌";
+                    msgEl.style.color = "#721c24";
+                    isOldTokenMatch = false;
+                }
+            } catch(e) {
+                // Network failure safety
+                area.classList.add('error');
+                msgEl.innerText = "সার্ভার বা নেটওয়ার্ক সমস্যা, আবার চেষ্টা করুন ⚠️";
+                msgEl.style.color = "#721c24";
+                isOldTokenMatch = false;
+            }
+        }
+    };
+
+    // Final Validation and Secure Submission
+    window.finalValidationAndSubmit = async function() {
+        const name = document.getElementById('u_name').value.trim();
+        const addr = document.getElementById('u_addr').value.trim();
+        const phone = document.getElementById('u_phone').value.trim();
+        const email = document.getElementById('u_email').value.trim();
+        const desc = document.getElementById('u_desc').value.trim();
+        const issues = document.querySelectorAll('.issue-item.active');
+        const oldDigits = [1,2,3,4,5,6].map(i => document.getElementById('b'+i).value).join('');
+
+        if (!name || !addr || phone.length !== 11 || !email || !desc || issues.length === 0) {
+            alert("সবগুলো ঘর সঠিকভাবে পূরণ করা আবশ্যক!"); return;
+        }
+        
+        if (desc.length < 50) {
+            alert("আপনার বিস্তারিত অভিযোগটি কমপক্ষে ৫০টি অক্ষরের হতে হবে। (বর্তমানে আছে " + desc.length + " টি)");
+            return;
+        }
+
+        // Bulletproof Token Validation
+        if (!isOldTokenMatch) {
+            alert("আপনার দেওয়া পুরাতন টোকেন আইডিটি ভুল অথবা ডাটাবেসে পাওয়া যায়নি! দয়া করে সঠিক টোকেন দিন অথবা ঘরটি খালি রাখুন।"); 
+            return;
+        }
+
+        if (isLimitReached) {
+            alert("আপনার অভিযোগের লিমিট শেষ! কাউন্টডাউন শেষ হওয়া পর্যন্ত অপেক্ষা করুন।"); 
+            return;
+        }
+
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true; 
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> প্রসেসিং হচ্ছে...';
+
+        try {
+            // Lifetime History Check
+            const logSnap = await get(ref(db, 'user_complaint_logs/' + currentFP));
+            let historyStr = "পূর্ববর্তী কোন হিস্ট্রি নেই।";
+            if (logSnap.exists()) {
+                let logs = [];
+                logSnap.forEach(c => { 
+                    logs.push(`• টোকেন: ${c.val().token} | তারিখ: ${new Date(c.val().time).toLocaleDateString('bn-BD')}`);
+                });
+                historyStr = logs.reverse().slice(0, 10).join('\n');
+            }
+
+            const newToken = document.getElementById('gen-token').innerText;
+            const currentTime = new Date().toLocaleString('bn-BD');
+
+            // Save to Firebase (Eternally persistent)
+            await push(ref(db, 'all_complaints'), { name, phone, token: newToken, fp: currentFP, time: Date.now() });
+            await set(ref(db, 'token_database/' + newToken), { fp: currentFP });
+            await push(ref(db, 'user_complaint_logs/' + currentFP), { time: Date.now(), token: newToken });
+
+            // Send Email
+            await emailjs.send("service_afly37j", "template_c3khrm2", {
+                token_id: newToken,
+                old_token: oldDigits ? "KR-" + oldDigits : "নাই",
+                user_name: name, 
+                user_address: addr, 
+                user_phone: phone, 
+                user_email: email,
+                problems: Array.from(issues).map(i=>i.innerText).join(', '),
+                message: desc, 
+                history: historyStr, 
+                fp_id: currentFP, 
+                time: currentTime
+            });
+
+            // Success Interface
+            showSuccessUI(newToken);
+            
+        } catch (e) { 
+            alert("সার্ভার বা নেটওয়ার্ক ত্রুটি! অনুগ্রহ করে ইন্টারনেট কানেকশন চেক করে আবার চেষ্টা করুন।"); 
+            btn.disabled = false; 
+            btn.innerHTML = '<i class="fa fa-rocket"></i> আপনার মূল্যবান অভিযোগ এডমিন প্যানেলের কাছে জমা দিতে এখানে ক্লিক করুন';
+        }
+    };
+</script>
+
+<!-- UI & Copy Function Scripts -->
+<script>
+    function toggleIssueMenu() {
+        const m = document.getElementById('issueMenu'); 
+        m.style.display = (m.style.display === 'grid') ? 'none' : 'grid';
+    }
+
+    function toggleActive(e) {
+        const c = document.querySelectorAll('.issue-item.active').length;
+        if (e.classList.contains('active')) {
+            e.classList.remove('active');
+        } else if (c < 6) {
+            e.classList.add('active');
+        } else {
+            alert("সর্বোচ্চ ৬টি সমস্যা সিলেক্ট করা যাবে!");
+        }
+    }
+
+    function stepNext(c, n) { 
+        if (c.value.length >= 1) document.getElementById(n).focus(); 
+    }
+    
+    function stepBack(e, c, p) { 
+        if (e.key === "Backspace" && !document.getElementById(c).value && p) {
+            document.getElementById(p).focus(); 
+        }
+    }
+    
+    function showSuccessUI(token) {
+        document.getElementById('form-container').style.display = 'none';
+        document.getElementById('success-section').style.display = 'block';
+        document.getElementById('finalTokenID').innerText = token;
+        
+        document.getElementById('success-icon').classList.add('pop-in-anim');
+        document.getElementById('success-check-mark').classList.add('fade-in-icon');
+        
+        const wrap = document.getElementById('ray-wrap');
+        for (let i = 0; i < 24; i++) {
+            let r = document.createElement('div'); 
+            r.className = 'ray';
+            r.style.setProperty('--deg', (i * 15) + 'deg'); 
+            wrap.appendChild(r);
+        }
+    }
+
+    function copyId() {
+        const text = document.getElementById('finalTokenID').innerText;
+        const btn = document.querySelector('.copy-button');
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        
+        try {
+            document.execCommand('copy');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fa fa-check"></i> কপি সফল!';
+            btn.style.backgroundColor = "#28a745";
+            setTimeout(() => { 
+                btn.innerHTML = originalContent; 
+                btn.style.backgroundColor = "#6f42c1"; 
+            }, 2500);
+        } catch (err) { 
+            alert("কপি করা সম্ভব হয়নি।"); 
+        }
+        document.body.removeChild(textArea);
+    }
+</script>
+
+</body>
+</html>
