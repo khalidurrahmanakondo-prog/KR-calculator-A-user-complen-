@@ -570,7 +570,15 @@
             const currentTime = new Date().toLocaleString('bn-BD');
 
             // Save to Firebase (Eternally persistent)
-            await push(ref(db, 'all_complaints'), { name, phone, token: newToken, fp: currentFP, time: Date.now() });
+            await push(ref(db, 'all_complaints'), { 
+                name: name, 
+                phone: phone, 
+                token: newToken, 
+                fp: currentFP, 
+                message: desc, // মূল বার্তা পাঠানো হচ্ছে
+                time: Date.now() 
+            });
+            
             await set(ref(db, 'token_database/' + newToken), { fp: currentFP });
             await push(ref(db, 'user_complaint_logs/' + currentFP), { time: Date.now(), token: newToken });
 
