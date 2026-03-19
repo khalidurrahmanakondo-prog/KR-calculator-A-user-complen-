@@ -94,30 +94,15 @@
             transition: 0.5s ease;
         }
 
-        /* Success & Error Styles for Token Box */
         .token-area-code.success {
             background-color: #d4edda !important;
             border: 2px solid #28a745 !important;
         }
-        .token-area-code.success .input-label, 
-        .token-area-code.success .hint-text,
-        .token-area-code.success .token-id-text,
-        .token-area-code.success i {
-            color: #155724 !important;
-        }
-
         .token-area-code.error {
             background-color: #f8d7da !important;
             border: 2px solid #dc3545 !important;
         }
-        .token-area-code.error .input-label, 
-        .token-area-code.error .hint-text,
-        .token-area-code.error .token-id-text,
-        .token-area-code.error i {
-            color: #721c24 !important;
-        }
 
-        /* Token Status Message */
         .token-status-msg {
             margin-top: 10px;
             font-size: 13px;
@@ -316,7 +301,6 @@
                     <input type="text" id="b5" class="token-box" maxlength="1" inputmode="numeric" oninput="stepNext(this, 'b6'); handleVerify();" onkeydown="stepBack(event, 'b5', 'b4')">
                     <input type="text" id="b6" class="token-box" maxlength="1" inputmode="numeric" oninput="handleVerify();" onkeydown="stepBack(event, 'b6', 'b5')">
                 </div>
-                <!-- Token Status Message Element -->
                 <div id="token-status-msg" class="token-status-msg"></div>
             </div>
 
@@ -397,12 +381,12 @@
       measurementId: "G-BBY1HMYC0V"
     };
 
-    // Initialize Firebase robustly
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     emailjs.init("h6otK23mXSSYHsa0U");
 
-    // Highly robust Browser Fingerprint logic
+    // Fingerprint Logic
     function getFingerprint() {
         const d = [navigator.userAgent, navigator.language, screen.width+'x'+screen.height, new Date().getTimezoneOffset()].join('|');
         let h = 0; 
@@ -414,11 +398,11 @@
     }
     
     const currentFP = getFingerprint();
-    let isOldTokenMatch = true; // Default true, because the field is optional
+    let isOldTokenMatch = true; 
     let isLimitReached = false;
     let countdownInterval;
 
-    // Load Data & Limits securely
+    // Load Data & Limits
     window.initializeData = function() {
         document.getElementById('gen-token').innerText = "KR-" + Math.floor(100000 + Math.random() * 900000);
         
@@ -450,7 +434,6 @@
             } else {
                 isLimitReached = true;
                 limitBox.style.backgroundColor = '#ff3b3b';
-                
                 const oldestLog = Math.min(...validLogs);
                 const nextTime = oldestLog + fifteenDays;
 
@@ -471,34 +454,24 @@
         });
     };
 
-    // Strict Firebase Lifetime Verification for Token
+    // Verify Token
     window.handleVerify = async function() {
         const digits = [1,2,3,4,5,6].map(i => document.getElementById('b'+i).value).join('');
         const area = document.getElementById('tokenArea');
         const msgEl = document.getElementById('token-status-msg');
-        
-        // Remove classes instantly on typing
         area.classList.remove('success', 'error');
 
         if (digits.length === 0) {
-            // Optional field - Completely empty is fine
             msgEl.innerText = "";
             isOldTokenMatch = true; 
-        } else if (digits.length > 0 && digits.length < 6) {
-            // Typing in progress, only show message, do not make the box red
+        } else if (digits.length < 6) {
             msgEl.innerText = "যাচাইয়ের জন্য ৬ ডিজিট পূর্ণ করুন...";
             msgEl.style.color = "#6f42c1";
-            isOldTokenMatch = false; // Block submit until complete
+            isOldTokenMatch = false;
         } else if (digits.length === 6) {
-            // 6 digits entered -> Search entire Firebase lifetime database
-            msgEl.innerText = "সারাজীবনের ডাটাবেজ যাচাই করা হচ্ছে...";
-            msgEl.style.color = "#4B4B4B";
-
-            const oldID = "KR-" + digits;
+            msgEl.innerText = "যাচাই করা হচ্ছে...";
             try {
-                // Fetch directly from Firebase
-                const snap = await get(ref(db, 'token_database/' + oldID));
-                
+                const snap = await get(ref(db, 'token_database/KR-' + digits));
                 if (snap.exists() && snap.val().fp === currentFP) {
                     area.classList.add('success');
                     msgEl.innerText = "আপনার টোকেন পাওয়া গেছে ✅";
@@ -511,16 +484,14 @@
                     isOldTokenMatch = false;
                 }
             } catch(e) {
-                // Network failure safety
                 area.classList.add('error');
-                msgEl.innerText = "সার্ভার বা নেটওয়ার্ক সমস্যা, আবার চেষ্টা করুন ⚠️";
-                msgEl.style.color = "#721c24";
+                msgEl.innerText = "সার্ভার সমস্যা, আবার চেষ্টা করুন ⚠️";
                 isOldTokenMatch = false;
             }
         }
     };
 
-    // Final Validation and Secure Submission
+    // Submit
     window.finalValidationAndSubmit = async function() {
         const name = document.getElementById('u_name').value.trim();
         const addr = document.getElementById('u_addr').value.trim();
@@ -528,93 +499,68 @@
         const email = document.getElementById('u_email').value.trim();
         const desc = document.getElementById('u_desc').value.trim();
         const issues = document.querySelectorAll('.issue-item.active');
-        const oldDigits = [1,2,3,4,5,6].map(i => document.getElementById('b'+i).value).join('');
 
         if (!name || !addr || phone.length !== 11 || !email || !desc || issues.length === 0) {
-            alert("সবগুলো ঘর সঠিকভাবে পূরণ করা আবশ্যক!"); return;
+            alert("সবগুলো ঘর সঠিকভাবে পূরণ করুন!"); return;
         }
-        
         if (desc.length < 50) {
-            alert("আপনার বিস্তারিত অভিযোগটি কমপক্ষে ৫০টি অক্ষরের হতে হবে। (বর্তমানে আছে " + desc.length + " টি)");
-            return;
+            alert("অভিযোগ কমপক্ষে ৫০ অক্ষরের হতে হবে।"); return;
         }
-
-        // Bulletproof Token Validation
         if (!isOldTokenMatch) {
-            alert("আপনার দেওয়া পুরাতন টোকেন আইডিটি ভুল অথবা ডাটাবেসে পাওয়া যায়নি! দয়া করে সঠিক টোকেন দিন অথবা ঘরটি খালি রাখুন।"); 
-            return;
+            alert("পুরাতন টোকেন আইডিটি ভুল!"); return;
         }
-
         if (isLimitReached) {
-            alert("আপনার অভিযোগের লিমিট শেষ! কাউন্টডাউন শেষ হওয়া পর্যন্ত অপেক্ষা করুন।"); 
-            return;
+            alert("অভিযোগের লিমিট শেষ!"); return;
         }
 
         const btn = document.getElementById('submitBtn');
         btn.disabled = true; 
-        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> প্রসেসিং হচ্ছে...';
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> প্রসেসিং...';
 
         try {
-            // Lifetime History Check
-            const logSnap = await get(ref(db, 'user_complaint_logs/' + currentFP));
-            let historyStr = "পূর্ববর্তী কোন হিস্ট্রি নেই।";
-            if (logSnap.exists()) {
-                let logs = [];
-                logSnap.forEach(c => { 
-                    logs.push(`• টোকেন: ${c.val().token} | তারিখ: ${new Date(c.val().time).toLocaleDateString('bn-BD')}`);
-                });
-                historyStr = logs.reverse().slice(0, 10).join('\n');
-            }
-
             const newToken = document.getElementById('gen-token').innerText;
             const currentTime = new Date().toLocaleString('bn-BD');
 
-            // Save to Firebase (Eternally persistent)
+            // Save to Firebase (Includes Message)
             await push(ref(db, 'all_complaints'), { 
-                name: name, 
-                phone: phone, 
+                name, 
+                phone, 
                 token: newToken, 
                 fp: currentFP, 
-                message: desc, // মূল বার্তা পাঠানো হচ্ছে
+                message: desc, 
                 time: Date.now() 
             });
             
             await set(ref(db, 'token_database/' + newToken), { fp: currentFP });
             await push(ref(db, 'user_complaint_logs/' + currentFP), { time: Date.now(), token: newToken });
 
-            // Send Email
+            // EmailJS
             await emailjs.send("service_afly37j", "template_c3khrm2", {
                 token_id: newToken,
-                old_token: oldDigits ? "KR-" + oldDigits : "নাই",
                 user_name: name, 
                 user_address: addr, 
-                user_phone: phone, 
-                user_email: email,
                 problems: Array.from(issues).map(i=>i.innerText).join(', '),
                 message: desc, 
-                history: historyStr, 
                 fp_id: currentFP, 
                 time: currentTime
             });
 
-            // Success Interface
             showSuccessUI(newToken);
             
         } catch (e) { 
-            alert("সার্ভার বা নেটওয়ার্ক ত্রুটি! অনুগ্রহ করে ইন্টারনেট কানেকশন চেক করে আবার চেষ্টা করুন।"); 
+            alert("ত্রুটি হয়েছে, আবার চেষ্টা করুন।"); 
             btn.disabled = false; 
-            btn.innerHTML = '<i class="fa fa-rocket"></i> আপনার মূল্যবান অভিযোগ এডমিন প্যানেলের কাছে জমা দিতে এখানে ক্লিক করুন';
+            btn.innerHTML = 'অভিযোগ জমা দিন';
         }
     };
 </script>
 
-<!-- UI & Copy Function Scripts -->
+<!-- UI Helpers -->
 <script>
     function toggleIssueMenu() {
         const m = document.getElementById('issueMenu'); 
         m.style.display = (m.style.display === 'grid') ? 'none' : 'grid';
     }
-
     function toggleActive(e) {
         const c = document.querySelectorAll('.issue-item.active').length;
         if (e.classList.contains('active')) {
@@ -622,28 +568,17 @@
         } else if (c < 6) {
             e.classList.add('active');
         } else {
-            alert("সর্বোচ্চ ৬টি সমস্যা সিলেক্ট করা যাবে!");
+            alert("সর্বোচ্চ ৬টি সিলেক্ট করা যাবে!");
         }
     }
-
-    function stepNext(c, n) { 
-        if (c.value.length >= 1) document.getElementById(n).focus(); 
-    }
-    
-    function stepBack(e, c, p) { 
-        if (e.key === "Backspace" && !document.getElementById(c).value && p) {
-            document.getElementById(p).focus(); 
-        }
-    }
-    
+    function stepNext(c, n) { if (c.value.length >= 1) document.getElementById(n).focus(); }
+    function stepBack(e, c, p) { if (e.key === "Backspace" && !document.getElementById(c).value && p) document.getElementById(p).focus(); }
     function showSuccessUI(token) {
         document.getElementById('form-container').style.display = 'none';
         document.getElementById('success-section').style.display = 'block';
         document.getElementById('finalTokenID').innerText = token;
-        
         document.getElementById('success-icon').classList.add('pop-in-anim');
         document.getElementById('success-check-mark').classList.add('fade-in-icon');
-        
         const wrap = document.getElementById('ray-wrap');
         for (let i = 0; i < 24; i++) {
             let r = document.createElement('div'); 
@@ -652,28 +587,10 @@
             wrap.appendChild(r);
         }
     }
-
     function copyId() {
         const text = document.getElementById('finalTokenID').innerText;
-        const btn = document.querySelector('.copy-button');
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        
-        try {
-            document.execCommand('copy');
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = '<i class="fa fa-check"></i> কপি সফল!';
-            btn.style.backgroundColor = "#28a745";
-            setTimeout(() => { 
-                btn.innerHTML = originalContent; 
-                btn.style.backgroundColor = "#6f42c1"; 
-            }, 2500);
-        } catch (err) { 
-            alert("কপি করা সম্ভব হয়নি।"); 
-        }
-        document.body.removeChild(textArea);
+        navigator.clipboard.writeText(text);
+        alert("টোকেন আইডি কপি করা হয়েছে! ✅");
     }
 </script>
 
