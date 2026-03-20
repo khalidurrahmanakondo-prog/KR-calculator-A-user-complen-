@@ -6,6 +6,9 @@
     <title>KR Calculator A - Support Center</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
+    <!-- FingerprintJS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
+    
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
@@ -365,11 +368,9 @@
 
 <!-- Firebase Modular SDK & Core Logic (Eternally Connected) -->
 <script type="module">
-    // Firebase Modular SDK Import
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
     import { getDatabase, ref, push, set, get, onValue } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
-    // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyAwYro75-Mx5K0ZBKlGXqOm8z6ywyjuBIk",
       authDomain: "kr-calculator-a-database.firebaseapp.com",
@@ -381,32 +382,38 @@
       measurementId: "G-BBY1HMYC0V"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     emailjs.init("h6otK23mXSSYHsa0U");
 
-    // Fingerprint Logic
-    function getFingerprint() {
-        const d = [navigator.userAgent, navigator.language, screen.width+'x'+screen.height, new Date().getTimezoneOffset()].join('|');
-        let h = 0; 
-        for (let i = 0; i < d.length; i++) { 
-            h = ((h << 5) - h) + d.charCodeAt(i); 
-            h |= 0; 
+    async function getStaticID() {
+        let savedID = localStorage.getItem('kr_permanent_id');
+        if (savedID) return savedID;
+
+        const fpJS = await FingerprintJS.load();
+        const result = await fpJS.get();
+        const rawID = result.visitorId;
+
+        let hash = 0;
+        for (let i = 0; i < rawID.length; i++) {
+            hash = ((hash << 5) - hash) + rawID.charCodeAt(i);
+            hash |= 0;
         }
-        return "ID-" + Math.abs(h);
+        const finalID = "ID-" + Math.abs(hash);
+        localStorage.setItem('kr_permanent_id', finalID);
+        return finalID;
     }
     
-    const currentFP = getFingerprint();
     let isOldTokenMatch = true; 
     let isLimitReached = false;
     let countdownInterval;
 
-    // Load Data & Limits
-    window.initializeData = function() {
+    window.initializeData = async function() {
         document.getElementById('gen-token').innerText = "KR-" + Math.floor(100000 + Math.random() * 900000);
         
-        const logRef = ref(db, 'user_complaint_logs/' + currentFP);
+        const myID = await getStaticID();
+        const logRef = ref(db, 'user_complaint_logs/' + myID);
+        
         onValue(logRef, (snapshot) => {
             const now = Date.now();
             const fifteenDays = 15 * 24 * 60 * 60 * 1000;
@@ -454,11 +461,12 @@
         });
     };
 
-    // Verify Token
     window.handleVerify = async function() {
         const digits = [1,2,3,4,5,6].map(i => document.getElementById('b'+i).value).join('');
         const area = document.getElementById('tokenArea');
         const msgEl = document.getElementById('token-status-msg');
+        const myID = await getStaticID();
+        
         area.classList.remove('success', 'error');
 
         if (digits.length === 0) {
@@ -472,7 +480,7 @@
             msgEl.innerText = "যাচাই করা হচ্ছে...";
             try {
                 const snap = await get(ref(db, 'token_database/KR-' + digits));
-                if (snap.exists() && snap.val().fp === currentFP) {
+                if (snap.exists() && snap.val().fp === myID) {
                     area.classList.add('success');
                     msgEl.innerText = "আপনার টোকেন পাওয়া গেছে ✅";
                     msgEl.style.color = "#155724";
@@ -491,7 +499,6 @@
         }
     };
 
-    // Submit
     window.finalValidationAndSubmit = async function() {
         const name = document.getElementById('u_name').value.trim();
         const addr = document.getElementById('u_addr').value.trim();
@@ -499,6 +506,7 @@
         const email = document.getElementById('u_email').value.trim();
         const desc = document.getElementById('u_desc').value.trim();
         const issues = document.querySelectorAll('.issue-item.active');
+        const myID = await getStaticID();
 
         if (!name || !addr || phone.length !== 11 || !email || !desc || issues.length === 0) {
             alert("সবগুলো ঘর সঠিকভাবে পূরণ করুন!"); return;
@@ -521,27 +529,20 @@
             const newToken = document.getElementById('gen-token').innerText;
             const currentTime = new Date().toLocaleString('bn-BD');
 
-            // Save to Firebase (Includes Message)
             await push(ref(db, 'all_complaints'), { 
-                name, 
-                phone, 
-                token: newToken, 
-                fp: currentFP, 
-                message: desc, 
-                time: Date.now() 
+                name, phone, token: newToken, fp: myID, message: desc, time: Date.now() 
             });
             
-            await set(ref(db, 'token_database/' + newToken), { fp: currentFP });
-            await push(ref(db, 'user_complaint_logs/' + currentFP), { time: Date.now(), token: newToken });
+            await set(ref(db, 'token_database/' + newToken), { fp: myID });
+            await push(ref(db, 'user_complaint_logs/' + myID), { time: Date.now(), token: newToken });
 
-            // EmailJS
             await emailjs.send("service_afly37j", "template_c3khrm2", {
                 token_id: newToken,
                 user_name: name, 
                 user_address: addr, 
                 problems: Array.from(issues).map(i=>i.innerText).join(', '),
                 message: desc, 
-                fp_id: currentFP, 
+                fp_id: myID, 
                 time: currentTime
             });
 
@@ -555,7 +556,6 @@
     };
 </script>
 
-<!-- UI Helpers -->
 <script>
     function toggleIssueMenu() {
         const m = document.getElementById('issueMenu'); 
@@ -573,12 +573,15 @@
     }
     function stepNext(c, n) { if (c.value.length >= 1) document.getElementById(n).focus(); }
     function stepBack(e, c, p) { if (e.key === "Backspace" && !document.getElementById(c).value && p) document.getElementById(p).focus(); }
+    
     function showSuccessUI(token) {
         document.getElementById('form-container').style.display = 'none';
         document.getElementById('success-section').style.display = 'block';
         document.getElementById('finalTokenID').innerText = token;
+        
         document.getElementById('success-icon').classList.add('pop-in-anim');
         document.getElementById('success-check-mark').classList.add('fade-in-icon');
+        
         const wrap = document.getElementById('ray-wrap');
         for (let i = 0; i < 24; i++) {
             let r = document.createElement('div'); 
@@ -587,10 +590,27 @@
             wrap.appendChild(r);
         }
     }
+
+    // কপি বাটন সচল করার ফাংশন
     function copyId() {
         const text = document.getElementById('finalTokenID').innerText;
-        navigator.clipboard.writeText(text);
-        alert("টোকেন আইডি কপি করা হয়েছে! ✅");
+        const btn = document.querySelector('.copy-button');
+        
+        // ক্লিপবোর্ডে কপি করা
+        navigator.clipboard.writeText(text).then(() => {
+            // কপি সফল হলে বাটনের ডিজাইন পরিবর্তন
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fa fa-check"></i> কপি সফল!';
+            btn.style.backgroundColor = "#28a745";
+            
+            // ২ সেকেন্ড পর আবার আগের অবস্থায় ফিরিয়ে আনা
+            setTimeout(() => { 
+                btn.innerHTML = originalContent; 
+                btn.style.backgroundColor = "#6f42c1"; 
+            }, 2000);
+        }).catch(err => {
+            alert("কপি করা সম্ভব হয়নি।");
+        });
     }
 </script>
 
