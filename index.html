@@ -72,7 +72,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .green { background-color: #28a745; }
-        .purple { background-color: #6f42c1; transition: 0.3s; }
+        .purple { background-color: #6f42c1; কটকtransition: 0.3s; }
         
         .limit-reached-bg { background-color: #ff3b3b !important; }
 
@@ -529,19 +529,22 @@
             const newToken = document.getElementById('gen-token').innerText;
             const currentTime = new Date().toLocaleString('bn-BD');
 
-            await push(ref(db, 'all_complaints'), { 
-                name, phone, token: newToken, fp: myID, message: desc, time: Date.now() 
-            });
-            
+            // ফায়ারবেসে সেভ
+            await push(ref(db, 'all_complaints'), { name, phone, token: newToken, fp: myID, message: desc, time: Date.now() });
             await set(ref(db, 'token_database/' + newToken), { fp: myID });
             await push(ref(db, 'user_complaint_logs/' + myID), { time: Date.now(), token: newToken });
 
+            // EmailJS সেন্ড (আপনার টেমপ্লেটের প্রতিটি ভেরিয়েবল অনুযায়ী)
             await emailjs.send("service_afly37j", "template_c3khrm2", {
                 token_id: newToken,
+                old_token: oldTokenDigits ? "KR-" + oldTokenDigits : "নাই",
                 user_name: name, 
                 user_address: addr, 
-                problems: Array.from(issues).map(i=>i.innerText).join(', '),
+                user_phone: phone, 
+                user_email: email,
+                problems: selectedIssues, // লাইন টু লাইন
                 message: desc, 
+                history: historyStr, // ১ বছরের হিস্ট্রি
                 fp_id: myID, 
                 time: currentTime
             });
