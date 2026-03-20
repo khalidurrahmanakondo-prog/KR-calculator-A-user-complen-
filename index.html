@@ -13,270 +13,59 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f1f1f1;
-            margin: 0;
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
-        .other-issue {
-            grid-column: span 2; 
-            width: 100%;        
-            text-align: center;
-            font-weight: bold;   
-        }
-        .app-container {
-            width: 100%;
-            max-width: 420px;
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            padding-bottom: 20px;
-            position: relative;
-        }
-        .header {
-            text-align: center;
-            padding: 20px;
-            border-bottom: 1px solid #eee;
-        }
-        .header h1 {
-            font-size: 24px;
-            color: #4B4B4B;
-            margin: 0;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-        .header p {
-            font-size: 14px;
-            color: #666;
-            margin: 5px 0 0;
-        }
-        .top-stats {
-            display: flex;
-            gap: 12px;
-            padding: 15px;
-        }
-        .stat-box {
-            flex: 1;
-            padding: 12px;
-            border-radius: 12px;
-            color: white;
-            font-size: 11px;
-            text-align: center;
-            font-weight: bold;
-            line-height: 1.5;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f1f1; margin: 0; padding: 10px; display: flex; justify-content: center; min-height: 100vh; }
+        .other-issue { grid-column: span 2; width: 100%; text-align: center; font-weight: bold; }
+        .app-container { width: 100%; max-width: 420px; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding-bottom: 20px; position: relative; }
+        .header { text-align: center; padding: 20px; border-bottom: 1px solid #eee; }
+        .header h1 { font-size: 24px; color: #4B4B4B; margin: 0; font-weight: bold; letter-spacing: 1px; }
+        .header p { font-size: 14px; color: #666; margin: 5px 0 0; }
+        .top-stats { display: flex; gap: 12px; padding: 15px; }
+        .stat-box { flex: 1; padding: 12px; border-radius: 12px; color: white; font-size: 11px; text-align: center; font-weight: bold; line-height: 1.5; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .green { background-color: #28a745; }
-        .purple { background-color: #6f42c1; কটকtransition: 0.3s; }
-        
-        .limit-reached-bg { background-color: #ff3b3b !important; }
-
+        .purple { background-color: #6f42c1; transition: 0.3s; }
         .form-section { padding: 15px; }
-
-        .input-label {
-            font-size: 14px;
-            color: #333;
-            font-weight: bold;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .token-area-code {
-            border: 2px dashed #6f42c1;
-            padding: 15px;
-            border-radius: 15px;
-            background-color: #f9f7ff;
-            margin-bottom: 20px;
-            transition: 0.5s ease;
-        }
-
-        .token-area-code.success {
-            background-color: #d4edda !important;
-            border: 2px solid #28a745 !important;
-        }
-        .token-area-code.error {
-            background-color: #f8d7da !important;
-            border: 2px solid #dc3545 !important;
-        }
-
-        .token-status-msg {
-            margin-top: 10px;
-            font-size: 13px;
-            font-weight: bold;
-            text-align: center;
-            transition: 0.3s;
-        }
-
-        .token-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 10px;
-        }
+        .input-label { font-size: 14px; color: #333; font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .token-area-code { border: 2px dashed #6f42c1; padding: 15px; border-radius: 15px; background-color: #f9f7ff; margin-bottom: 20px; transition: 0.5s ease; }
+        .token-area-code.success { background-color: #d4edda !important; border: 2px solid #28a745 !important; }
+        .token-area-code.error { background-color: #f8d7da !important; border: 2px solid #dc3545 !important; }
+        .token-status-msg { margin-top: 10px; font-size: 13px; font-weight: bold; text-align: center; transition: 0.3s; }
+        .token-container { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; }
         .token-id-text { font-weight: bold; color: #333; font-size: 18px; }
-        .token-box {
-            width: 38px;
-            height: 45px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            color: #6f42c1;
-            background: white;
-            transition: 0.3s;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-            font-size: 14px;
-            background-color: #fafafa;
-        }
+        .token-box { width: 38px; height: 45px; border: 1px solid #ccc; border-radius: 8px; text-align: center; font-size: 20px; font-weight: bold; color: #6f42c1; background: white; transition: 0.3s; }
+        .input-field { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; font-size: 14px; background-color: #fafafa; }
         .input-field:focus { border-color: #28a745; outline: none; background: #fff; }
-
-        .issue-trigger-btn {
-            width: 100%;
-            padding: 15px;
-            background-color: #424e5e;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .issue-grid {
-            display: none;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-            animation: fadeIn 0.3s ease;
-        }
+        .issue-trigger-btn { width: 100%; padding: 15px; background-color: #424e5e; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .issue-grid { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .issue-item {
-            padding: 12px;
-            background: #f0f0f0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 13px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .issue-item.active {
-            background: #ff0000;
-            color: white;
-            border-color: #cc0000;
-        }
-
-        .submit-btn {
-            background: linear-gradient(to right, #28a745, #218838);
-            color: white;
-            border: none;
-            padding: 18px;
-            width: 100%;
-            border-radius: 35px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 12px rgba(40,167,69,0.3);
-            transition: 0.3s;
-        }
-        .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
-
-        #success-section {
-            display: none;
-            padding: 40px 25px;
-            text-align: center;
-            position: relative;
-        }
-        .icon-box {
-            width: 90px;
-            height: 90px;
-            background: #28a745;
-            border-radius: 50%;
-            margin: 0 auto 25px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            z-index: 5;
-            transform: scale(0);
-        }
+        .issue-item { padding: 12px; background: #f0f0f0; border: 1px solid #ddd; border-radius: 8px; text-align: center; font-size: 13px; cursor: pointer; font-weight: 500; }
+        .issue-item.active { background: #ff0000; color: white; border-color: #cc0000; }
+        .submit-btn { background: linear-gradient(to right, #28a745, #218838); color: white; border: none; padding: 18px; width: 100%; border-radius: 35px; font-size: 13px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 12px rgba(40,167,69,0.3); transition: 0.3s; }
+        #success-section { display: none; padding: 40px 25px; text-align: center; position: relative; }
+        .icon-box { width: 90px; height: 90px; background: #28a745; border-radius: 50%; margin: 0 auto 25px; display: flex; justify-content: center; align-items: center; position: relative; z-index: 5; transform: scale(0); }
         .icon-box i { color: white; font-size: 45px; opacity: 0; }
         .pop-in-anim { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .fade-in-icon { animation: fadeInIcon 0.3s 0.5s forwards; }
-
         @keyframes popIn { to { transform: scale(1); } }
         @keyframes fadeInIcon { to { opacity: 1; } }
+        .ray { position: absolute; width: 3px; height: 40px; background: linear-gradient(to bottom, #28a745, transparent); top: 50%; left: 50%; transform-origin: top center; opacity: 0; animation: greenRay 2s infinite ease-out; }
+        @keyframes greenRay { 0% { transform: rotate(var(--deg)) translateY(35px); opacity: 1; } 100% { transform: rotate(var(--deg)) translateY(100px); opacity: 0; } }
+        .token-display { background: #fdfbff; border: 2px dashed #6f42c1; padding: 18px; border-radius: 15px; margin: 25px 0; font-size: 24px; font-weight: 900; color: #333; letter-spacing: 1px; }
+        .copy-button { background: #6f42c1; color: white; border: none; padding: 15px 35px; border-radius: 50px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; }
 
-        .ray {
-            position: absolute;
-            width: 3px;
-            height: 40px;
-            background: linear-gradient(to bottom, #28a745, transparent);
-            top: 50%; left: 50%;
-            transform-origin: top center;
-            opacity: 0;
-            animation: greenRay 2s infinite ease-out;
-        }
-        @keyframes greenRay {
-            0% { transform: rotate(var(--deg)) translateY(35px); opacity: 1; }
-            100% { transform: rotate(var(--deg)) translateY(100px); opacity: 0; }
-        }
-
-        .token-display {
-            background: #fdfbff;
-            border: 2px dashed #6f42c1;
-            padding: 18px;
-            border-radius: 15px;
-            margin: 25px 0;
-            font-size: 24px;
-            font-weight: 900;
-            color: #333;
-            letter-spacing: 1px;
-        }
-
-        .copy-button {
-            background: #6f42c1;
-            color: white;
-            border: none;
-            padding: 15px 35px;
-            border-radius: 50px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            position: relative;
-            transition: 0.3s;
-        }
-        .info-text { font-size: 14px; color: #555; line-height: 1.5; margin: 15px 0; }
-        .hint-text { font-size: 11px; color: #888; margin-bottom: 15px; display: block; }
+        /* Ban Overlay */
+        #ban-overlay { position: fixed; inset: 0; background: #000; z-index: 999999; display: none; justify-content: center; align-items: center; font-family: sans-serif; }
+        .rainbow-bar { position: absolute; top: 0; left: 0; height: 10px; width: 100%; background: #222; overflow: hidden; }
+        .rainbow-bar::after { content: ''; position: absolute; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #0000ff, #9400d3); animation: moveRainbow 2.5s linear infinite; }
+        @keyframes moveRainbow { 0% { left: -100%; } 100% { left: 100%; } }
+        .ban-card { width: 90%; max-width: 440px; background: rgba(10,10,10,0.98); border: 2px solid #333; text-align: center; padding: 50px 30px; box-shadow: 0 0 50px rgba(255,180,0,0.15); clip-path: polygon(10% 0, 90% 0, 100% 8%, 100% 100%, 0 100%, 0 8%); }
+        .ban-card h1 { color: #ffb400; font-size: 30px; text-transform: uppercase; margin: 20px 0; }
+        .ban-card p { color: #ccc; font-size: 16px; line-height: 1.6; margin-bottom: 35px; }
+        .btn-appeal { display: block; width: 100%; padding: 16px; background: linear-gradient(135deg, #ffb400, #cc9100); color: #000; text-decoration: none; font-weight: 700; font-size: 18px; text-transform: uppercase; border-radius: 4px; border: 1px solid #997000; }
     </style>
 </head>
 <body onload="initializeData()">
 
-<div class="app-container">
+<div class="app-container" id="main-app-box">
     
     <div id="form-container">
         <div class="header">
@@ -287,14 +76,13 @@
         <div class="top-stats">
             <div class="stat-box green">আপনার নতুন টোকেন সংগ্রহ করুন:<br><span id="gen-token">KR-000000</span></div>
             <div id="limit-box" class="stat-box purple">
-                <span id="limit-display">লোড হচ্ছে...</span>
+                <span id="limit-display">লোড হচ্ছে... <br>অনুগ্রহ করে অপেক্ষা করুন </span>
             </div>
         </div>
 
         <div class="form-section">
             <div id="tokenArea" class="token-area-code">
                 <div class="input-label"><i class="fa fa-folder-open"></i> পুরাতন টোকেন আইডি দিন</div>
-                <span class="hint-text">আগের সমস্যা সমাধান না হয়ে থাকলে টোকেনটি দিন</span>
                 <div class="token-container">
                     <span class="token-id-text">KR-</span>
                     <input type="text" id="b1" class="token-box" maxlength="1" inputmode="numeric" oninput="stepNext(this, 'b2'); handleVerify();">
@@ -308,7 +96,7 @@
             </div>
 
             <div class="input-label">👤 আপনার নাম লিখুন</div>
-            <input type="text" id="u_name" class="input-field" placeholder="সম্পূর্ণ নাম লিখুন যেমন তোফায়েল আহমাদ">
+            <input type="text" id="u_name" class="input-field" placeholder="সম্পূর্ণ নাম লিখুন যেমন তোফায়েল আহমেদ">
 
             <div class="input-label">📍 আপনার বর্তমান ঠিকানা</div>
             <input type="text" id="u_addr" class="input-field" placeholder="গ্রাম, থানা, জেলা">
@@ -358,28 +146,36 @@
         <div id="ray-wrap" style="position: absolute; top: 18%; left: 50%;"></div>
         <div class="icon-box" id="success-icon"><i class="fa fa-check" id="success-check-mark"></i></div>
         <h2 style="color: #28a745; font-size: 28px; margin: 0; font-weight: 800;">অভিনন্দন!</h2>
-        <p class="info-text">আপনার অভিযোগটি সফলভাবে গ্রহণ করা হয়েছে। দ্রুত আমরা আপনার সাথে যোগাযোগ করবো।</p>
+        <p class="info-text">আপনার অভিযোগটি সফলভাবে গ্রহণ করা হয়েছে। দ্রুত আমরা আপনার সাথে যোগাযোগ করবো। অথবা আপনার সমস্যা সমাধান করবো ইনশাআল্লাহ</p>
         <div class="token-display" id="finalTokenID"></div>
-        <button class="copy-button" onclick="copyId()"><i class="fa fa-copy"></i> টোকেন আইডি কপি করুন</button>
+        <button class="copy-button" id="copyBtn" onclick="copyId()"><i class="fa fa-copy"></i> টোকেন আইডি কপি করুন</button>
         <button style="margin-top:10px;" class="copy-button" onclick="location.reload()"><i class="fa fa-home"></i> ফিরে যান</button>
     </div>
 
 </div>
 
-<!-- Firebase Modular SDK & Core Logic (Eternally Connected) -->
+<!-- Ban Overlay -->
+<div id="ban-overlay">
+    <div class="rainbow-bar"></div>
+    <div class="ban-card">
+        <div style="font-size:70px; color:#ffb400;">⚠️</div>
+        <h1>অ্যাকাউন্ট ব্যান করা হয়েছে</h1>
+        <p>আমাদের এন্টি-হ্যাক সিস্টেম আপনার ডিভাইসে অস্বাভাবিক কার্যকলাপ শনাক্ত করেছে। অ্যাপের নিয়ম লঙ্ঘনের কারণে আপনার এক্সেস বর্তমানে বন্ধ।</p>
+        <div style="background:#111; padding:12px; border:1px solid #333; margin-bottom:30px; color:#ffb400; font-family:monospace; font-weight:bold; font-size:18px;" id="banned-id-text">ID: --</div>
+        <a href="mailto:khalidurrahmanakondo@gmail.com" class="btn-appeal">আপিল করুন</a>
+    </div>
+</div>
+
+<!-- Firebase Modular SDK & Core Logic -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getDatabase, ref, push, set, get, onValue } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+    import { getDatabase, ref, push, set, get, onValue, remove } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAwYro75-Mx5K0ZBKlGXqOm8z6ywyjuBIk",
       authDomain: "kr-calculator-a-database.firebaseapp.com",
       databaseURL: "https://kr-calculator-a-database-default-rtdb.firebaseio.com",
       projectId: "kr-calculator-a-database",
-      storageBucket: "kr-calculator-a-database.firebasestorage.app",
-      messagingSenderId: "589418851848",
-      appId: "1:589418851848:web:8f38a5258a37535d86abbd",
-      measurementId: "G-BBY1HMYC0V"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -389,16 +185,10 @@
     async function getStaticID() {
         let savedID = localStorage.getItem('kr_permanent_id');
         if (savedID) return savedID;
-
         const fpJS = await FingerprintJS.load();
         const result = await fpJS.get();
-        const rawID = result.visitorId;
-
         let hash = 0;
-        for (let i = 0; i < rawID.length; i++) {
-            hash = ((hash << 5) - hash) + rawID.charCodeAt(i);
-            hash |= 0;
-        }
+        for (let i = 0; i < result.visitorId.length; i++) { hash = ((hash << 5) - hash) + result.visitorId.charCodeAt(i); hash |= 0; }
         const finalID = "ID-" + Math.abs(hash);
         localStorage.setItem('kr_permanent_id', finalID);
         return finalID;
@@ -410,51 +200,55 @@
 
     window.initializeData = async function() {
         document.getElementById('gen-token').innerText = "KR-" + Math.floor(100000 + Math.random() * 900000);
-        
         const myID = await getStaticID();
-        const logRef = ref(db, 'user_complaint_logs/' + myID);
-        
-        onValue(logRef, (snapshot) => {
-            const now = Date.now();
-            const fifteenDays = 15 * 24 * 60 * 60 * 1000;
-            let validLogs = [];
 
+        // ১. ব্লক ও পপ-আপ লিসেনার
+        onValue(ref(db, 'blocked_users/' + myID), (snapshot) => {
+            if (snapshot.exists()) {
+                document.getElementById('ban-overlay').style.display = 'flex';
+                document.getElementById('banned-id-text').innerText = "ID: " + myID;
+            }
+        });
+
+        onValue(ref(db, 'system_alerts/' + myID), (snapshot) => {
+            if (snapshot.exists()) {
+                alert("📢 এডমিন বার্তা:\n\n" + snapshot.val().message);
+                remove(ref(db, 'system_alerts/' + myID));
+            }
+        });
+
+        // ২. লিমিট চেক ও কাউন্টডাউন
+        onValue(ref(db, 'user_complaint_logs/' + myID), (snapshot) => {
+            const now = Date.now();
+            let validLogs = [];
             if (snapshot.exists()) {
                 snapshot.forEach(child => {
-                    const logTime = child.val().time;
-                    if (now - logTime < fifteenDays) {
-                        validLogs.push(logTime);
-                    }
+                    if (now - child.val().time < 15*24*60*60*1000) validLogs.push(child.val().time);
                 });
             }
-
             const remaining = 3 - validLogs.length;
             const limitBox = document.getElementById('limit-box');
             const limitDisplay = document.getElementById('limit-display');
-
             clearInterval(countdownInterval);
 
             if (remaining > 0) {
                 isLimitReached = false;
-                limitBox.style.backgroundColor = '#6f42c1';
-                limitDisplay.innerHTML = `অভিযোগ বাকি আছে:<br>${remaining} টি`;
+                limitBox.style.backgroundColor = '#28a745';
+                limitDisplay.innerHTML = `আপনার অভিযোগ বাকি আছে:<br>${remaining} টি`;
             } else {
                 isLimitReached = true;
                 limitBox.style.backgroundColor = '#ff3b3b';
                 const oldestLog = Math.min(...validLogs);
-                const nextTime = oldestLog + fifteenDays;
-
+                const nextTime = oldestLog + (15*24*60*60*1000);
                 countdownInterval = setInterval(() => {
                     const diff = nextTime - Date.now();
-                    if (diff <= 0) {
-                        clearInterval(countdownInterval);
-                        initializeData();
-                    } else {
+                    if (diff <= 0) { clearInterval(countdownInterval); initializeData(); }
+                    else {
                         const d = Math.floor(diff / 86400000);
                         const h = Math.floor((diff % 86400000) / 3600000);
                         const m = Math.floor((diff % 3600000) / 60000);
                         const s = Math.floor((diff % 60000) / 1000);
-                        limitDisplay.innerHTML = `পরবর্তী অভিযোগ চালু হবে:<br>${d}দ ${h}ঘ ${m}মি ${s}সে`;
+                        limitDisplay.innerHTML = `🤦আপনার লিমিট শেষ🤦 <br> পুনরায় অভিযোগের অনুমতির জন্য অপেক্ষা করুন🙏<br>${d} দিন <br> ${h} ঘন্টা ${m} মিনিট ${s} সেকেন্ড`;
                     }
                 }, 1000);
             }
@@ -466,36 +260,23 @@
         const area = document.getElementById('tokenArea');
         const msgEl = document.getElementById('token-status-msg');
         const myID = await getStaticID();
-        
         area.classList.remove('success', 'error');
-
-        if (digits.length === 0) {
-            msgEl.innerText = "";
-            isOldTokenMatch = true; 
-        } else if (digits.length < 6) {
-            msgEl.innerText = "যাচাইয়ের জন্য ৬ ডিজিট পূর্ণ করুন...";
-            msgEl.style.color = "#6f42c1";
-            isOldTokenMatch = false;
-        } else if (digits.length === 6) {
+        if (digits.length === 0) { msgEl.innerText = ""; isOldTokenMatch = true; }
+        else if (digits.length < 6) { msgEl.innerText = "আপনার টোকেন যাচাইয়ের জন্য ৬ ডিজিট পূর্ণ করুন..."; isOldTokenMatch = false; }
+        else if (digits.length === 6) {
             msgEl.innerText = "যাচাই করা হচ্ছে...";
             try {
                 const snap = await get(ref(db, 'token_database/KR-' + digits));
                 if (snap.exists() && snap.val().fp === myID) {
                     area.classList.add('success');
-                    msgEl.innerText = "আপনার টোকেন পাওয়া গেছে ✅";
-                    msgEl.style.color = "#155724";
+                    msgEl.innerText = "🎉অভিনন্দন! আপনার টোকেন পাওয়া গেছে ✅";
                     isOldTokenMatch = true;
                 } else {
                     area.classList.add('error');
-                    msgEl.innerText = "আপনার টোকেন পাওয়া যায়নি ❌";
-                    msgEl.style.color = "#721c24";
+                    msgEl.innerText = "🥺🥺🥺 আপনার টোকেন পাওয়া যায়নি ❌";
                     isOldTokenMatch = false;
                 }
-            } catch(e) {
-                area.classList.add('error');
-                msgEl.innerText = "সার্ভার সমস্যা, আবার চেষ্টা করুন ⚠️";
-                isOldTokenMatch = false;
-            }
+            } catch(e) { area.classList.add('error'); msgEl.innerText = "সার্ভার সমস্যা ⚠️"; isOldTokenMatch = false; }
         }
     };
 
@@ -505,117 +286,96 @@
         const phone = document.getElementById('u_phone').value.trim();
         const email = document.getElementById('u_email').value.trim();
         const desc = document.getElementById('u_desc').value.trim();
-        const issues = document.querySelectorAll('.issue-item.active');
+        const activeIssues = document.querySelectorAll('.issue-item.active');
         const myID = await getStaticID();
 
-        if (!name || !addr || phone.length !== 11 || !email || !desc || issues.length === 0) {
+        if (!name || !addr || phone.length !== 11 || !email || !desc || activeIssues.length === 0) {
             alert("সবগুলো ঘর সঠিকভাবে পূরণ করুন!"); return;
         }
-        if (desc.length < 50) {
-            alert("অভিযোগ কমপক্ষে ৫০ অক্ষরের হতে হবে।"); return;
-        }
-        if (!isOldTokenMatch) {
-            alert("পুরাতন টোকেন আইডিটি ভুল!"); return;
-        }
-        if (isLimitReached) {
-            alert("অভিযোগের লিমিট শেষ!"); return;
-        }
+        if (desc.length < 50) { alert("বিস্তারিত  অভিযোগ কমপক্ষে ৫০ অক্ষরের হতে হবে।"); return; }
+        if (!isOldTokenMatch || isLimitReached) { alert("আপনার অভিযোগ লিমিট শেষ। অনুগ্রহ করে অপেক্ষা করুন"); return; }
 
         const btn = document.getElementById('submitBtn');
-        btn.disabled = true; 
-        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> প্রসেসিং...';
+        btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> প্রসেসিং...';
 
         try {
             const newToken = document.getElementById('gen-token').innerText;
             const currentTime = new Date().toLocaleString('bn-BD');
+            const issuesFormatted = Array.from(activeIssues).map((i, index) => `${index + 1}. ${i.innerText}`).join('<br>');
 
-            // ফায়ারবেসে সেভ
-            await push(ref(db, 'all_complaints'), { name, phone, token: newToken, fp: myID, message: desc, time: Date.now() });
+            // ১ বছরের বিস্তারিত হিস্ট্রি তৈরি (ইমেইলের জন্য)
+            const allCompsSnap = await get(ref(db, 'all_complaints'));
+            let historyHTML = "পূর্ববর্তী কোন হিস্ট্রি নেই।";
+            if (allCompsSnap.exists()) {
+                let logs = [];
+                allCompsSnap.forEach(c => { 
+                    const val = c.val();
+                    if(val.fp === myID) {
+                        logs.push(`
+<div style="border:1px solid #ddd; padding:10px; margin-bottom:10px; border-radius:8px; background:#f9f9f9;">
+  <b style="color:#6f42c1;">টোকেন: ${val.token}</b> | তারিখ: ${new Date(val.time).toLocaleDateString('bn-BD')}<br>
+  <b>নাম:</b> ${val.name}<br>
+  <b>ঠিকানা:</b> ${val.address || val.u_addr || "নাই"}<br>
+  <b>ফোন:</b> ${val.phone}<br>
+  <b>ইমেইল:</b> ${val.email || "নাই"}<br>
+  <b>সমস্যা:</b> ${val.problems}<br>
+  <b>বিস্তারিত:</b> ${val.message}
+</div>`);
+                    }
+                });
+                if(logs.length > 0) historyHTML = logs.reverse().join('');
+            }
+
+            // ১. অভিযোগ ডাটাবেসে পাঠানো
+            await push(ref(db, 'all_complaints'), { name, phone, address: addr, email, token: newToken, fp: myID, message: desc, problems: issuesFormatted, time: Date.now() });
+            
+            // ২. টোকেন ডাটাবেস আপডেট
             await set(ref(db, 'token_database/' + newToken), { fp: myID });
+
+            // ৩. লিমিট লগ আপডেট
             await push(ref(db, 'user_complaint_logs/' + myID), { time: Date.now(), token: newToken });
 
-            // EmailJS সেন্ড (আপনার টেমপ্লেটের প্রতিটি ভেরিয়েবল অনুযায়ী)
+            // ৪. EmailJS সেন্ড
             await emailjs.send("service_afly37j", "template_c3khrm2", {
                 token_id: newToken,
-                old_token: oldTokenDigits ? "KR-" + oldTokenDigits : "নাই",
-                user_name: name, 
-                user_address: addr, 
-                user_phone: phone, 
-                user_email: email,
-                problems: selectedIssues, // লাইন টু লাইন
-                message: desc, 
-                history: historyStr, // ১ বছরের হিস্ট্রি
-                fp_id: myID, 
-                time: currentTime
+                old_token: [1,2,3,4,5,6].map(i => document.getElementById('b'+i).value).join('') || "নাই",
+                user_name: name, user_address: addr, user_phone: phone, user_email: email,
+                problems: issuesFormatted, message: desc, history: historyHTML, fp_id: myID, time: currentTime
             });
 
             showSuccessUI(newToken);
-            
-        } catch (e) { 
-            alert("ত্রুটি হয়েছে, আবার চেষ্টা করুন।"); 
-            btn.disabled = false; 
-            btn.innerHTML = 'অভিযোগ জমা দিন';
-        }
+        } catch (e) { alert("ত্রুটি হয়েছে!"); btn.disabled = false; btn.innerText = "অভিযোগ জমা দিন"; }
     };
 </script>
 
 <script>
-    function toggleIssueMenu() {
-        const m = document.getElementById('issueMenu'); 
-        m.style.display = (m.style.display === 'grid') ? 'none' : 'grid';
-    }
+    function toggleIssueMenu() { const m = document.getElementById('issueMenu'); m.style.display = (m.style.display === 'grid') ? 'none' : 'grid'; }
     function toggleActive(e) {
         const c = document.querySelectorAll('.issue-item.active').length;
-        if (e.classList.contains('active')) {
-            e.classList.remove('active');
-        } else if (c < 6) {
-            e.classList.add('active');
-        } else {
-            alert("সর্বোচ্চ ৬টি সিলেক্ট করা যাবে!");
-        }
+        if (e.classList.contains('active')) { e.classList.remove('active'); }
+        else if (c < 6) { e.classList.add('active'); }
+        else { alert("সর্বোচ্চ ৬টি সমস্যা সিলেক্ট করা যাবে!"); }
     }
     function stepNext(c, n) { if (c.value.length >= 1) document.getElementById(n).focus(); }
     function stepBack(e, c, p) { if (e.key === "Backspace" && !document.getElementById(c).value && p) document.getElementById(p).focus(); }
-    
     function showSuccessUI(token) {
         document.getElementById('form-container').style.display = 'none';
         document.getElementById('success-section').style.display = 'block';
         document.getElementById('finalTokenID').innerText = token;
-        
         document.getElementById('success-icon').classList.add('pop-in-anim');
         document.getElementById('success-check-mark').classList.add('fade-in-icon');
-        
         const wrap = document.getElementById('ray-wrap');
-        for (let i = 0; i < 24; i++) {
-            let r = document.createElement('div'); 
-            r.className = 'ray';
-            r.style.setProperty('--deg', (i * 15) + 'deg'); 
-            wrap.appendChild(r);
-        }
+        for (let i = 0; i < 24; i++) { let r = document.createElement('div'); r.className = 'ray'; r.style.setProperty('--deg', (i * 15) + 'deg'); wrap.appendChild(r); }
     }
-
-    // কপি বাটন সচল করার ফাংশন
     function copyId() {
         const text = document.getElementById('finalTokenID').innerText;
-        const btn = document.querySelector('.copy-button');
-        
-        // ক্লিপবোর্ডে কপি করা
         navigator.clipboard.writeText(text).then(() => {
-            // কপি সফল হলে বাটনের ডিজাইন পরিবর্তন
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = '<i class="fa fa-check"></i> কপি সফল!';
-            btn.style.backgroundColor = "#28a745";
-            
-            // ২ সেকেন্ড পর আবার আগের অবস্থায় ফিরিয়ে আনা
-            setTimeout(() => { 
-                btn.innerHTML = originalContent; 
-                btn.style.backgroundColor = "#6f42c1"; 
-            }, 2000);
-        }).catch(err => {
-            alert("কপি করা সম্ভব হয়নি।");
+            const btn = document.getElementById('copyBtn');
+            const old = btn.innerHTML;
+            btn.innerHTML = '<i class="fa fa-check"></i> কপি সফল!'; btn.style.background = "#28a745";
+            setTimeout(() => { btn.innerHTML = old; btn.style.background = "#6f42c1"; }, 2000);
         });
     }
 </script>
-
 </body>
 </html>
