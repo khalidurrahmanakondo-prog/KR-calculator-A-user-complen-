@@ -503,8 +503,7 @@
             } catch(e) { area.classList.add('error'); msgEl.innerText = "সার্ভার সমস্যা ⚠️"; isOldTokenMatch = false; }
         }
     };
-
-    window.finalValidationAndSubmit = async function() {
+window.finalValidationAndSubmit = async function() {
         const name = document.getElementById('u_name').value.trim();
         const addr = document.getElementById('u_addr').value.trim();
         const phone = document.getElementById('u_phone').value.trim();
@@ -513,48 +512,70 @@
         const activeIssues = document.querySelectorAll('.issue-item.active');
         const myID = await getStaticID();
 
+        // পুরাতন টোকেন ইনপুট থেকে সংগ্রহ
+        const b1 = document.getElementById('b1').value;
+        const b2 = document.getElementById('b2').value;
+        const b3 = document.getElementById('b3').value;
+        const b4 = document.getElementById('b4').value;
+        const b5 = document.getElementById('b5').value;
+        const b6 = document.getElementById('b6').value;
+        const oldTokenInput = b1 + b2 + b3 + b4 + b5 + b6;
+        const oldTokenText = oldTokenInput.length === 6 ? "KR-" + oldTokenInput : "ইউজার লিখেনি";
+
         if (!name || !addr || phone.length !== 11 || !email || !desc || activeIssues.length === 0) {
             alert("সবগুলো ঘর সঠিকভাবে পূরণ করুন!"); return;
         }
         if (desc.length < 50) { alert("অভিযোগ কমপক্ষে ৫০ অক্ষরের হতে হবে।"); return; }
-        if (!isOldTokenMatch || isLimitReached) { alert("বর্তমানে আপনার অভিযোগ এক্সেস বন্ধ রয়েছে। অনুগ্রহ করে অপেক্ষা করুন অথবা ইমেইল করুন।"); return; }
-
+        if (!isOldTokenMatch || isLimitReached) { 
+    alert(
+        "বর্তমানে আপনার অভিযোগ এক্সেস বন্ধ রয়েছে\n" + 
+        "সম্ভবত কারণ দুটিঃ\n" + 
+        "১. টোকেন আইডি ভুল🥺\n" + 
+        "২. আপনার অভিযোগের লিমিট শেষ🤦"
+    ); 
+    return; 
+}
+red
         const btn = document.getElementById('submitBtn');
         btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> পাঠানো হচ্ছে ...';
 
         try {
             const newToken = document.getElementById('gen-token').innerText;
             const currentTime = new Date().toLocaleString('bn-BD');
-            const issuesFormatted = Array.from(activeIssues).map((i, index) => `${index + 1}. ${i.innerText}`).join('<br>');
+            
+            // ১. অভিযোগের ধরন সাজানো
+            const issuesFormatted = Array.from(activeIssues)
+                .map((i, index) => `${index + 1}. ${i.innerText}`)
+                .join('<br>');
 
-            // ১ বছরের বিস্তারিত হিস্ট্রি তৈরি (ইমেইলের জন্য)
-            const allCompsSnap = await get(ref(db, 'all_complaints'));
+            // ২. ১ বছরের বিস্তারিত হিস্ট্রি তৈরি (user_complaint_logs থেকে তথ্য নেওয়া)
+            const logSnap = await get(ref(db, 'user_complaint_logs/' + myID));
             let historyHTML = "গত ১ বছরে আপনার কোনো হিস্ট্রি নেই।";
             const now = Date.now();
             const oneYearAgo = now - (365 * 24 * 60 * 60 * 1000);
 
-            if (allCompsSnap.exists()) {
+            if (logSnap.exists()) {
                 let logsArray = [];
-                allCompsSnap.forEach(c => { 
+                logSnap.forEach(c => { 
                     const val = c.val();
-                    if(val.fp === myID && val.time >= oneYearAgo) {
+                    if(val.time >= oneYearAgo) {
                         logsArray.push({
                             time: val.time,
                             html: `
-<div style="margin-bottom: 12px; font-family: 'Helvetica', Arial, sans-serif;">
-    <details style="border: 1px solid #6f42c1; border-radius: 8px; overflow: hidden; background: #ffffff;">
-        <summary style="background-color: #6f42c1; color: #ffffff; padding: 12px; cursor: pointer; font-weight: bold; outline: none; list-style: none;">
-            🆔 টোকেন: ${val.token} | 📅 তারিখ: ${new Date(val.time).toLocaleDateString('bn-BD')}
-        </summary>
-        <div style="padding: 15px; background: #f9f9f9; color: #333; border-top: 1px solid #eee;">
-            <p style="margin: 4px 0;"><strong>নাম:</strong> ${val.name}</p>
-            <p style="margin: 4px 0;"><strong>ঠিকানা:</strong> ${val.address || val.u_addr || "খালিদ ভাই ইউজারের ঠিকানা পাওয়া যায়নি "}</p>
-            <p style="margin: 4px 0;"><strong>ফোন:</strong> ${val.phone}</p>
-            <p style="margin: 4px 0;"><strong>ইমেইল:</strong> ${val.email || "খালিদ ভাই ইউজারের ইমেইল পাওয়া যায়নি "}</p>
-            <p style="margin: 8px 0; color: #d9534f;"><strong>সমস্যা:</strong> ${val.problems}</p>
-            <p style="margin: 8px 0; padding: 8px; background: #fff; border-left: 3px solid #6f42c1;"><strong>বিস্তারিত:</strong> ${val.message}</p>
+<div style="margin-bottom: 15px; font-family: 'Helvetica', Arial, sans-serif; border: 1px solid #6f42c1; border-radius: 10px; overflow: hidden; background: #ffffff;">
+    <div style="background-color: #6f42c1; color: #ffffff; padding: 10px; font-weight: bold; text-align: center;">
+        🆔 টোকেন: ${val.token} | 📅 তারিখ: ${new Date(val.time).toLocaleDateString('bn-BD')}
+    </div>
+    <div style="padding: 12px; background: #f9f9f9; color: #333; font-size: 14px; line-height: 1.6;">
+        <p style="margin: 3px 0;"><strong>👤 নাম:</strong> ${val.u_name || 'নাই'}</p>
+        <p style="margin: 3px 0;"><strong>📍 ঠিকানা:</strong> ${val.u_addr || 'নাই'}</p>
+        <p style="margin: 3px 0;"><strong>📞 ফোন:</strong> ${val.u_phone || 'নাই'}</p>
+        <p style="margin: 3px 0;"><strong>📧 ইমেইল:</strong> ${val.u_email || 'নাই'}</p>
+        <p style="margin: 5px 0; color: #d32f2f;"><strong>⚠️ সমস্যা:</strong><br>${val.u_probs || 'নাই'}</p>
+        <div style="margin-top: 8px; padding: 10px; background: #fff; border-left: 4px solid #6f42c1; font-style: italic; border-radius: 4px;">
+            <strong>📝 বিস্তারিত অভিযোগ:</strong><br>${val.u_msg || 'নাই'}
         </div>
-    </details>
+    </div>
 </div>`
                         });
                     }
@@ -565,32 +586,47 @@
                 }
             }
 
-            // ১. অভিযোগ ডাটাবেসে পাঠানো
-            await push(ref(db, 'all_complaints'), { name, phone, address: addr, email, token: newToken, fp: myID, message: desc, problems: issuesFormatted, time: Date.now() });
+            // ৩. মূল অভিযোগ ডাটাবেসে পাঠানো
+            await push(ref(db, 'all_complaints'), { 
+                name, phone, address: addr, email, token: newToken, fp: myID, message: desc, problems: issuesFormatted, time: now 
+            });
             
-            // ২. টোকেন ডাটাবেস আপডেট
+            // ৪. টোকেন ডাটাবেস আপডেট
             await set(ref(db, 'token_database/' + newToken), { fp: myID });
 
-            // ৩. লিমিট লগ আপডেট (সফল হওয়ার পর)
-            await push(ref(db, 'user_complaint_logs/' + myID), { time: Date.now(), token: newToken });
+            // ৫. ইউজার লগে সব তথ্য সেভ করা (যাতে ভবিষ্যতে ইমেইলে সব দেখা যায়)
+            await push(ref(db, 'user_complaint_logs/' + myID), { 
+                time: now, 
+                token: newToken,
+                u_name: name,
+                u_phone: phone,
+                u_addr: addr,
+                u_email: email,
+                u_msg: desc,
+                u_probs: issuesFormatted
+            });
 
-            // ৪. EmailJS সেন্ড
+            // ৬. EmailJS সেন্ড
             await emailjs.send("service_afly37j", "template_c3khrm2", {
                 token_id: newToken,
-                old_token: [1,2,3,4,5,6].map(i => document.getElementById('b'+i).value).join('') || "ইউজার লিখেনি",
+                old_token: oldTokenText,
                 user_name: name, 
                 user_address: addr, 
                 user_phone: phone, 
                 user_email: email,
                 problems: issuesFormatted, 
                 message: desc, 
-                history: historyHTML, // ইমেইলে বক্স আকারে বিস্তারিত হিস্ট্রি যাবে
+                history: historyHTML, 
                 fp_id: myID, 
                 time: currentTime
             });
 
             showSuccessUI(newToken);
-        } catch (e) { alert("ত্রুটি হয়েছে!"); btn.disabled = false; btn.innerText = "অভিযোগ জমা দিন"; }
+        } catch (e) { 
+            console.error(e);
+            alert("ত্রুটি হয়েছে! অনুগ্রহ করে আবার চেষ্টা করুন।"); 
+            btn.disabled = false; btn.innerHTML = "অভিযোগ জমা দিন"; 
+        }
     };
 </script>
 
@@ -613,15 +649,63 @@
         const wrap = document.getElementById('ray-wrap');
         for (let i = 0; i < 24; i++) { let r = document.createElement('div'); r.className = 'ray'; r.style.setProperty('--deg', (i * 15) + 'deg'); wrap.appendChild(r); }
     }
-    function copyId() {
-        const text = document.getElementById('finalTokenID').innerText;
-        navigator.clipboard.writeText(text).then(() => {
-            const btn = document.getElementById('copyBtn');
-            const old = btn.innerHTML;
-            btn.innerHTML = '<i class="fa fa-check"></i> আপনার টোকেন আইডি  কপি করা সফল হয়েছে !'; btn.style.background = "#28a745";
-            setTimeout(() => { btn.innerHTML = old; btn.style.background = "#6f42c1"; }, 2000);
-        });
+function copyId() {
+    const textElement = document.getElementById('finalTokenID');
+    if (!textElement) return;
+
+    const textToCopy = textElement.innerText;
+    const btn = document.getElementById('copyBtn');
+    const oldHtml = btn.innerHTML;
+
+    // কপি সফল হওয়ার পর যা দেখাবে
+    const successUI = () => {
+        btn.innerHTML = '<i class="fa fa-check"></i> আপনার টোকেন আইডি কপি করা সফল হয়েছে !';
+        btn.style.background = "#28a745";
+        setTimeout(() => {
+            btn.innerHTML = oldHtml;
+            btn.style.background = "#6f42c1";
+        }, 2000);
+    };
+
+    // মেথড ১: আধুনিক ক্লিপবোর্ড এপিআই (HTTPS এর জন্য)
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(textToCopy)
+            .then(successUI)
+            .catch(() => fallbackCopy(textToCopy, successUI)); // এরর হলে ব্যাকআপ মেথডে যাবে
+    } else {
+        // মেথড ২: ব্যাকআপ মেথড (পুরাতন বা ইনসিকিউর ব্রাউজারের জন্য)
+        fallbackCopy(textToCopy, successUI);
     }
+}
+
+// ব্যাকআপ কপি ফাংশন
+function fallbackCopy(text, callback) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    // টেক্সট এরিয়াটি স্ক্রিনের বাইরে রাখা
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    textArea.style.top = "0";
+    document.body.appendChild(textArea);
+    
+    textArea.focus();
+    textArea.select();
+    textArea.setSelectionRange(0, 99999); // মোবাইল ফোনের জন্য
+
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            callback();
+        } else {
+            alert("কপি করা সম্ভব হয়নি। অনুগ্রহ করে ম্যানুয়ালি কপি করুন।");
+        }
+    } catch (err) {
+        alert("আপনার ব্রাউজারে কপি করার অনুমতি নেই।");
+    }
+
+    document.body.removeChild(textArea);
+}
 </script>
 </body>
 </html>
