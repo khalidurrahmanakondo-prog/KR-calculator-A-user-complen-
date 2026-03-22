@@ -520,7 +520,7 @@ window.finalValidationAndSubmit = async function() {
         const b5 = document.getElementById('b5').value;
         const b6 = document.getElementById('b6').value;
         const oldTokenInput = b1 + b2 + b3 + b4 + b5 + b6;
-        const oldTokenText = oldTokenInput.length === 6 ? "KR-" + oldTokenInput : "ইউজার লিখেনি";
+        const oldTokenText = oldTokenInput.length === 6 ? "KR-" + oldTokenInput : "নেই";
 
         if (!name || !addr || phone.length !== 11 || !email || !desc || activeIssues.length === 0) {
             alert("সবগুলো ঘর সঠিকভাবে পূরণ করুন!"); return;
